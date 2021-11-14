@@ -1,6 +1,16 @@
 // 변수
 $mainColor: #ff0000;
 
+.wow-enter {
+  // 에니메이션 시작때 적용할 css
+  opacity: 0;
+}
+.wow-enter-active {
+  // 에니메이션 동작할때 적용할 css
+  opacity: 1;
+  transition: all 0.5s;
+}
+
 .red {
   color: $mainColor;
 }

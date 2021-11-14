@@ -1,8 +1,11 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Navbar, Container, Nav, NavDropdown, Button } from "react-bootstrap";
 import { useHistory, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { stockContext } from "./App";
 import "./Detail.scss";
+import { CSSTransition } from "react-transition-group";
 
 let Box = styled.div`
   padding: 20px;
@@ -34,6 +37,9 @@ function Detail(props) {
   //   console.log(props.shoes);
   //   fetchResult();
   // }, []);
+
+  let stock = useContext(stockContext);
+  // import해온 context 범위의 state 사용 가능해짐
 
   console.log(props.shoes);
 
@@ -83,6 +89,9 @@ function Detail(props) {
     console.log(stock);
     return stock;
   }
+
+  let [tab, tabChange] = useState(0);
+  let [onoff, onoffChange] = useState(false);
 
   return (
     <div className="container">
@@ -143,8 +152,63 @@ function Detail(props) {
           </button>
         </div>
       </div>
+
+      <Nav className="mt-5" variant="tabs" defaultActiveKey="link-0">
+        <Nav.Item>
+          <Nav.Link
+            eventKey="link-0"
+            onClick={() => {
+              tabChange(0);
+              onoffChange(false);
+            }}
+          >
+            Active
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            eventKey="link-1"
+            onClick={() => {
+              tabChange(1);
+              onoffChange(false);
+            }}
+          >
+            Option 1
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link
+            eventKey="link-2"
+            onClick={() => {
+              tabChange(2);
+              onoffChange(false);
+            }}
+          >
+            Option 2
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      {/* in은 애니메이션 킬지 안킬지, classNames는 css지정 이름, timeout은 지속시간 */}
+      <CSSTransition in={onoff} classNames="wow" timeout={500}>
+        <TabContent tab={tab} onoffChange={onoffChange} />
+      </CSSTransition>
     </div>
   );
+}
+
+function TabContent(props) {
+  useEffect(() => {
+    props.onoffChange(true);
+  });
+
+  if (props.tab === 0) {
+    return <div>0번째 내용입니다.</div>;
+  } else if (props.tab === 1) {
+    return <div>1번째 내용입니다.</div>;
+  } else if (props.tab === 2) {
+    return <div>2번째 내용입니다.</div>;
+  }
 }
 
 function Info(props) {

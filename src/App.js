@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Navbar, Container, Nav, NavDropdown, Button } from "react-bootstrap";
 import "./App.css";
 import shoeList from "./data";
@@ -19,12 +19,10 @@ let Pointer = styled.img`
   cursor: pointer;
 `;
 
-let Pointer2 = styled.div`
-  cursor: pointer;
-`;
+export let stockContext = React.createContext();
+// 범위 생성(다른 파일의 컴포넌트에서 사용할 시 export 필요)
 
 function App() {
-  let history = useHistory();
   let [shoes, shoesChange] = useState(shoeList);
   let [stock, stockChange] = useState([10, 11, 12, 15, 14, 20]);
 
@@ -83,11 +81,14 @@ function App() {
               </p>
             </div>
             <div className="container">
-              <div className="row">
-                {shoes.map((item, index) => {
-                  return <ItemBox item={item} index={index} key={index} />;
-                })}
-              </div>
+              {/* 범위 생성 html */}
+              <stockContext.Provider value={stock}>
+                <div className="row">
+                  {shoes.map((item, index) => {
+                    return <ItemBox item={item} index={index} key={index} />;
+                  })}
+                </div>
+              </stockContext.Provider>
               <button
                 className="btn btn-primary"
                 onClick={() => {
@@ -125,12 +126,14 @@ function App() {
             </div>
           </Route>
           <Route exact path="/detail/:id">
-            <Detail
-              shoes={shoes}
-              shoesChange={shoesChange}
-              stock={stock}
-              stockChange={stockChange}
-            />
+            <stockContext.Provider value={stock}>
+              <Detail
+                shoes={shoes}
+                shoesChange={shoesChange}
+                stock={stock}
+                stockChange={stockChange}
+              />
+            </stockContext.Provider>
           </Route>
 
           <Route path="/:id">
@@ -146,6 +149,9 @@ function App() {
 
 function ItemBox(props) {
   let history = useHistory();
+
+  // state 공유 범위 사용 변수
+  let stock = useContext(stockContext);
 
   return (
     <div
@@ -167,8 +173,18 @@ function ItemBox(props) {
       <p>
         {props.item.content} & {props.item.price}
       </p>
+      <Stock index={props.index}></Stock>
     </div>
   );
+}
+
+function Stock(props) {
+  // state 공유 범위 사용 변수
+  let stock = useContext(stockContext);
+
+  // 부모의 context범위 안에 포함되어 있는 컴포넌트들은 전부 state값 공유 가능
+  // 공유 범위 사용 변수 작성 시...
+  return <p>재고 : {stock[props.index]}</p>;
 }
 
 export default App;
