@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { combineReducers, createStore } from "redux";
 
 let basicState = [
   { id: 0, name: "멋진신발", quan: 2 },
@@ -15,14 +15,27 @@ let basicState = [
 ];
 
 function reducer(state = basicState, action) {
-  if (action.type === "addQuan") {
+  if (action.type === "addItem") {
     let copy = [...state];
-    copy[0].quan++;
+    let findName = copy.find((i) => {
+      return i.name == action.payload.name;
+    });
+    if (findName) {
+      findName.quan++;
+      return copy;
+    } else {
+      copy.push(action.payload);
+      return copy;
+    }
+  } else if (action.type === "addQuan") {
+    let copy = [...state];
+    console.log(action.payload.id);
+    copy[action.payload.id].quan++;
 
     return copy;
   } else if (action.type === "delQuan") {
     let copy = [...state];
-    if (copy[0].quan > 0) copy[0].quan--;
+    if (copy[action.payload.id].quan > 0) copy[action.payload.id].quan--;
 
     return copy;
   } else {
@@ -30,7 +43,17 @@ function reducer(state = basicState, action) {
   }
 }
 
-let store = createStore(reducer);
+let alertBasic = true;
+
+function reducer2(state = alertBasic, action) {
+  if (action.type === "alertClose") {
+    state = false;
+    return state;
+  }
+  return state;
+}
+
+let store = createStore(combineReducers({ reducer, reducer2 }));
 
 ReactDOM.render(
   <React.StrictMode>

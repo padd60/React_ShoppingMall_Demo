@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { stockContext } from "./App";
 import "./Detail.scss";
 import { CSSTransition } from "react-transition-group";
+import { connect } from "react-redux";
 
 let Box = styled.div`
   padding: 20px;
@@ -137,6 +138,15 @@ function Detail(props) {
             className="btn btn-danger"
             onClick={() => {
               props.stockChange(stockMinus);
+              props.dispatch({
+                type: "addItem",
+                payload: {
+                  id: props.state[props.state.length - 1].id + 1,
+                  name: selectItem.title,
+                  quan: 1,
+                },
+              });
+              history.push("/cart");
             }}
           >
             주문하기
@@ -215,4 +225,12 @@ function Info(props) {
   return <p>재고 : {props.stock[props.selectItem.id]}</p>;
 }
 
-export default Detail;
+function propsChange(state) {
+  console.log(state);
+  return {
+    state: state.reducer,
+    alert: state.reducer2,
+  };
+}
+
+export default connect(propsChange)(Detail);
