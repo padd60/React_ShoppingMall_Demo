@@ -172,7 +172,7 @@ function Detail(props) {
               onoffChange(false);
             }}
           >
-            Active
+            상품설명
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
@@ -183,7 +183,7 @@ function Detail(props) {
               onoffChange(false);
             }}
           >
-            Option 1
+            배송정보
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
@@ -194,7 +194,7 @@ function Detail(props) {
               onoffChange(false);
             }}
           >
-            Option 2
+            환불약관
           </Nav.Link>
         </Nav.Item>
       </Nav>

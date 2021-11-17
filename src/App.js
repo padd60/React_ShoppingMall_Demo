@@ -1,14 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, lazy, Suspense } from "react";
 import { Navbar, Container, Nav, NavDropdown, Button } from "react-bootstrap";
 import "./App.css";
 import shoeList from "./data";
 import styled from "styled-components";
 
 import { Link, Route, Switch, useHistory } from "react-router-dom";
-import Detail from "./Detail.js";
-import Cart from "./Cart.js";
 
 import axios from "axios";
+// import Detail from "./Detail.js";
+let Detail = lazy(() => {
+  return import("./Detail.js");
+});
+
+// import Cart from "./Cart.js";
+let Cart = lazy(() => {
+  return import("./Cart.js");
+});
 
 let Pointer = styled.img`
   cursor: pointer;
@@ -121,17 +128,21 @@ function App() {
         </Route>
         <Route exact path="/detail/:id">
           <stockContext.Provider value={stock}>
-            <Detail
-              shoes={shoes}
-              shoesChange={shoesChange}
-              stock={stock}
-              stockChange={stockChange}
-            />
+            <Suspense fallback={<div>로딩중입니다...</div>}>
+              <Detail
+                shoes={shoes}
+                shoesChange={shoesChange}
+                stock={stock}
+                stockChange={stockChange}
+              />
+            </Suspense>
           </stockContext.Provider>
         </Route>
 
         <Route path="/cart">
-          <Cart />
+          <Suspense fallback={<div>로딩중입니다...</div>}>
+            <Cart />
+          </Suspense>
         </Route>
 
         <Route path="/:id">
@@ -154,7 +165,7 @@ function ItemBox(props) {
     <div
       className="col-md-4"
       onClick={() => {
-        history.push("/detail/" + props.index);
+        history.push("/detail/" + props.item.id);
       }}
     >
       <Pointer
