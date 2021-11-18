@@ -1,4 +1,4 @@
-import React, { useContext, useState, lazy, Suspense } from "react";
+import React, { useContext, useState, lazy, Suspense, useEffect } from "react";
 import { Navbar, Container, Nav, NavDropdown, Button } from "react-bootstrap";
 import "./App.css";
 import shoeList from "./data";
@@ -7,6 +7,7 @@ import styled from "styled-components";
 import { Link, Route, Switch, useHistory } from "react-router-dom";
 
 import axios from "axios";
+import { useSelector } from "react-redux";
 // import Detail from "./Detail.js";
 let Detail = lazy(() => {
   return import("./Detail.js");
@@ -17,8 +18,21 @@ let Cart = lazy(() => {
   return import("./Cart.js");
 });
 
+let Storage = lazy(() => {
+  return import("./Storage.js");
+});
+
 let Pointer = styled.img`
   cursor: pointer;
+`;
+
+let TopTitle = styled.div`
+  width: 250px;
+  margin: 0 auto;
+  color: red;
+  padding: 30px 0 0;
+  border-bottom: 3px solid red;
+  margin-bottom: 20px;
 `;
 
 export let stockContext = React.createContext();
@@ -27,6 +41,8 @@ export let stockContext = React.createContext();
 function App() {
   let [shoes, shoesChange] = useState(shoeList);
   let [stock, stockChange] = useState([10, 11, 12, 15, 14, 20]);
+  let [recent, recentChange] = useState([]);
+  let [url, urlChange] = useState(0);
 
   // function dataAdd(data) {
   //   let newData = [...shoes];
@@ -34,11 +50,51 @@ function App() {
   //   shoesChange(addData);
   // }
 
+  let state = useSelector((state) => {
+    return state;
+  });
+
+  // localstorage 있으면 받아옴 없으면 패스
+  useEffect(() => {
+    let copy = [...state.reducer3];
+    let storage = JSON.parse(localStorage.getItem("local"));
+    if (storage) {
+      copy = [...storage];
+    }
+    state.reducer3 = copy;
+  }, [url]);
+
+  useEffect(() => {
+    let copy = [...recent];
+    let local = [...state.reducer3];
+    // console.log(local);
+    let IntLocal = local.map((i) => {
+      return parseInt(i);
+    });
+    // console.log(IntLocal);
+    if (IntLocal.length > 0) {
+    }
+    let newRecent = shoes.filter((i) => {
+      return IntLocal.includes(i.id);
+    });
+
+    copy = newRecent;
+    recentChange(copy);
+  }, [url]);
+
+  console.log(recent);
+
   return (
     <div className="App">
       <Navbar bg="light" expand="lg">
         <Container>
-          <Navbar.Brand as={Link} to="/">
+          <Navbar.Brand
+            as={Link}
+            to="/"
+            onClick={() => {
+              urlChange(url + 1);
+            }}
+          >
             ShoeShop
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -47,11 +103,26 @@ function App() {
               {/* <Nav.Link>
                 <Link to="/">Home</Link>
               </Nav.Link> */}
-              <Nav.Link as={Link} to="/">
+              <Nav.Link
+                as={Link}
+                to="/"
+                onClick={() => {
+                  urlChange(url + 1);
+                }}
+              >
                 Home
               </Nav.Link>
               <Nav.Link as={Link} to="/detail/0">
                 Detail
+              </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/storage"
+                onClick={() => {
+                  urlChange(url + 1);
+                }}
+              >
+                Recently viewed
               </Nav.Link>
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
@@ -134,6 +205,8 @@ function App() {
                 shoesChange={shoesChange}
                 stock={stock}
                 stockChange={stockChange}
+                url={url}
+                urlChange={urlChange}
               />
             </Suspense>
           </stockContext.Provider>
@@ -142,6 +215,31 @@ function App() {
         <Route path="/cart">
           <Suspense fallback={<div>로딩중입니다...</div>}>
             <Cart />
+          </Suspense>
+        </Route>
+
+        <Route path="/storage">
+          <Suspense fallback={<div>로딩중입니다...</div>}>
+            <div className="container">
+              <TopTitle>
+                <h1>최근 본 상품</h1>
+              </TopTitle>
+              <stockContext.Provider value={stock}>
+                <div className="row">
+                  {recent.map((item, index) => {
+                    return (
+                      <Storage
+                        item={item}
+                        index={index}
+                        key={index}
+                        stock={stock}
+                        stockChange={stockChange}
+                      />
+                    );
+                  })}
+                </div>
+              </stockContext.Provider>
+            </div>
           </Suspense>
         </Route>
 

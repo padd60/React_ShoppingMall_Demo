@@ -53,7 +53,21 @@ function reducer2(state = alertBasic, action) {
   return state;
 }
 
-let store = createStore(combineReducers({ reducer, reducer2 }));
+let localstorage = [];
+
+function reducer3(state = localstorage, action) {
+  return state;
+}
+
+let move = 0;
+
+function reducer4(state = move, action) {
+  return state;
+}
+
+let store = createStore(
+  combineReducers({ reducer, reducer2, reducer3, reducer4 })
+);
 
 ReactDOM.render(
   <React.StrictMode>

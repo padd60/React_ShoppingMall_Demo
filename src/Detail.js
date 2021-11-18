@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { stockContext } from "./App";
 import "./Detail.scss";
 import { CSSTransition } from "react-transition-group";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 
 let Box = styled.div`
   padding: 20px;
@@ -94,6 +94,25 @@ function Detail(props) {
   let [tab, tabChange] = useState(0);
   let [onoff, onoffChange] = useState(false);
 
+  let state = useSelector((state) => {
+    return state;
+  });
+
+  useEffect(() => {
+    let copy = [...state.reducer3];
+    console.log(copy);
+    let find = copy.find((i) => {
+      return i == id;
+    });
+    // 중복찾기
+    if (!find) {
+      copy.push(id); // usaParam으로 가져온 것
+    }
+    state.reducer3 = copy;
+    console.log(copy);
+    localStorage.setItem("local", JSON.stringify(copy));
+  }, []);
+
   return (
     <div className="container">
       <Box>
@@ -156,6 +175,7 @@ function Detail(props) {
             className="btn btn-danger"
             onClick={() => {
               history.push("/");
+              props.urlChange(props.url + 1);
             }}
           >
             뒤로가기
